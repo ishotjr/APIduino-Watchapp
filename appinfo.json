@@ -10,7 +10,8 @@
     "watchface": false
   },
   "appKeys": {
-    "KEY_DATA": 1
+    "verb": 0,
+    "data": 1
   },
   "resources": {
     "media": []

@@ -1,5 +1,6 @@
 #include <pebble.h>
 
+#define KEY_VERB 0 // 0 for GET, 1 for PUT; TODO: enum?
 #define KEY_DATA 1
 
 static Window *window;
@@ -31,16 +32,51 @@ static void outbox_sent_callback(DictionaryIterator *iterator, void *context) {
 }
 
 
+// TODO: message sending fn
+
 static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
   text_layer_set_text(text_layer, "Select");
+
+  // Begin dictionary
+  DictionaryIterator *iter;
+  app_message_outbox_begin(&iter);
+
+  // Add a key-value pair
+  dict_write_uint8(iter, KEY_VERB, 0); // GET
+  // (KEY_DATA unused for GET)
+
+  // Send the message!
+  app_message_outbox_send();
 }
 
 static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
   text_layer_set_text(text_layer, "Up");
+
+  // Begin dictionary
+  DictionaryIterator *iter;
+  app_message_outbox_begin(&iter);
+
+  // Add a key-value pair
+  dict_write_uint8(iter, KEY_VERB, 1); // PUT
+  dict_write_uint8(iter, KEY_DATA, 1); // ON
+
+  // Send the message!
+  app_message_outbox_send();
 }
 
 static void down_click_handler(ClickRecognizerRef recognizer, void *context) {
   text_layer_set_text(text_layer, "Down");
+
+  // Begin dictionary
+  DictionaryIterator *iter;
+  app_message_outbox_begin(&iter);
+
+  // Add a key-value pair
+  dict_write_uint8(iter, KEY_VERB, 1); // PUT
+  dict_write_uint8(iter, KEY_DATA, 0); // OFF
+
+  // Send the message!
+  app_message_outbox_send();
 }
 
 static void click_config_provider(void *context) {
@@ -78,7 +114,8 @@ static void init(void) {
   app_message_register_outbox_sent(outbox_sent_callback);
   
   // Open AppMessage with sensible buffer sizes
-  app_message_open(1, 1);
+  app_message_open(64, 64);
+  // TODO: ^^^ unsure why small (accurate?!) values fail after several messages?
 
   window = window_create();
   window_set_click_config_provider(window, click_config_provider);
