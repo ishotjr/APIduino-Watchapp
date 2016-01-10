@@ -1,9 +1,9 @@
 {
   "uuid": "13036b53-cd05-4629-ba55-23871da00756",
-  "shortName": "APIduino-Watchapp",
-  "longName": "APIduino-Watchapp",
-  "companyName": "MakeAwesomeHappen",
-  "versionLabel": "1.0",
+  "shortName": "APIduino",
+  "longName": "APIduino Demo Watchapp",
+  "companyName": "ishotjr.com",
+  "versionLabel": "0.1",
   "sdkVersion": "3",
   "targetPlatforms": ["aplite", "basalt", "chalk"],
   "watchapp": {
