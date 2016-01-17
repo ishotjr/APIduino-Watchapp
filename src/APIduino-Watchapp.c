@@ -5,7 +5,7 @@
 #define KEY_ENDPOINT 2 // 0: led; 1: tmp; 2: adc; 3: relay
 
 static Window *window;
-static TextLayer *text_layer;
+static TextLayer *s_debug_layer;
 
 static char s_buffer[64];
 
@@ -16,27 +16,45 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
   Tuple *data = dict_find(iterator, KEY_DATA);
   if (data) {
     snprintf(s_buffer, sizeof(s_buffer), "Received '%d'", data->value->uint16); // Flip-Flop uses uint16_t
-    text_layer_set_text(text_layer, s_buffer);
+    #ifdef PBL_COLOR
+      text_layer_set_text_color(s_debug_layer, GColorCyan);
+    #endif
+    text_layer_set_text(s_debug_layer, s_buffer);
   }  
 }
 
 static void inbox_dropped_callback(AppMessageResult reason, void *context) {
   APP_LOG(APP_LOG_LEVEL_ERROR, "Message dropped!");
+  #ifdef PBL_COLOR
+    text_layer_set_text_color(s_debug_layer, GColorOrange);
+  #endif
+  text_layer_set_text(s_debug_layer, "Message dropped!");
 }
 
 static void outbox_failed_callback(DictionaryIterator *iterator, AppMessageResult reason, void *context) {
   APP_LOG(APP_LOG_LEVEL_ERROR, "Outbox send failed!");
+  #ifdef PBL_COLOR
+    text_layer_set_text_color(s_debug_layer, GColorOrange);
+  #endif
+  text_layer_set_text(s_debug_layer, "Outbox send failed!");
 }
 
 static void outbox_sent_callback(DictionaryIterator *iterator, void *context) {
   APP_LOG(APP_LOG_LEVEL_INFO, "Outbox send success!");
+  #ifdef PBL_COLOR
+    text_layer_set_text_color(s_debug_layer, GColorOrange);
+  #endif
+  text_layer_set_text(s_debug_layer, "Outbox send success!");
 }
 
 
 // TODO: message sending fn
 
 static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
-  text_layer_set_text(text_layer, "Select");
+  #ifdef PBL_COLOR
+    text_layer_set_text_color(s_debug_layer, GColorMagenta);
+  #endif
+  text_layer_set_text(s_debug_layer, "Select");
 
   // Begin dictionary
   DictionaryIterator *iter;
@@ -57,7 +75,10 @@ static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
 }
 
 static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
-  text_layer_set_text(text_layer, "Up");
+  #ifdef PBL_COLOR
+    text_layer_set_text_color(s_debug_layer, GColorMagenta);
+  #endif
+  text_layer_set_text(s_debug_layer, "Up");
 
   // Begin dictionary
   DictionaryIterator *iter;
@@ -73,7 +94,10 @@ static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
 }
 
 static void down_click_handler(ClickRecognizerRef recognizer, void *context) {
-  text_layer_set_text(text_layer, "Down");
+  #ifdef PBL_COLOR
+    text_layer_set_text_color(s_debug_layer, GColorMagenta);
+  #endif
+  text_layer_set_text(s_debug_layer, "Down");
 
   // Begin dictionary
   DictionaryIterator *iter;
@@ -98,21 +122,22 @@ static void window_load(Window *window) {
   Layer *window_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(window_layer);
 
-  text_layer = text_layer_create((GRect) { .origin = { 0, 72 }, .size = { bounds.size.w, 20 } });
-  text_layer_set_text(text_layer, "Press a button");
-  text_layer_set_text_alignment(text_layer, GTextAlignmentCenter);
-  layer_add_child(window_layer, text_layer_get_layer(text_layer));
-  /*
-  s_output_layer = text_layer_create(GRect(5, 0, window_bounds.size.w - 5, window_bounds.size.h));
-  text_layer_set_font(s_output_layer, fonts_get_system_font(FONT_KEY_GOTHIC_24));
-  text_layer_set_text(s_output_layer, "Waiting...");
-  text_layer_set_overflow_mode(s_output_layer, GTextOverflowModeWordWrap);
-  layer_add_child(window_layer, text_layer_get_layer(s_output_layer));
-  */
+  s_debug_layer = text_layer_create((GRect) { .origin = { 0, bounds.size.h - 16 }, .size = { bounds.size.w - 0, 16 } });
+  text_layer_set_font(s_debug_layer, fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD));
+  #ifdef PBL_COLOR
+    text_layer_set_text_color(s_debug_layer, GColorBrightGreen);
+  #else
+    text_layer_set_text_color(s_debug_layer, GColorWhite);
+  #endif
+  text_layer_set_background_color(s_debug_layer, GColorBlack);
+  text_layer_set_text_alignment(s_debug_layer, GTextAlignmentCenter);
+  text_layer_set_overflow_mode(s_debug_layer, GTextOverflowModeTrailingEllipsis);
+  text_layer_set_text(s_debug_layer, "Waiting...");
+  layer_add_child(window_layer, text_layer_get_layer(s_debug_layer));
 }
 
 static void window_unload(Window *window) {
-  text_layer_destroy(text_layer);
+  text_layer_destroy(s_debug_layer);
 }
 
 static void init(void) {
