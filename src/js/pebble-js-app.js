@@ -17,7 +17,7 @@ function apiDuinoCall(isPut, value) {
 
   // construct URL
   // TODO: add config vs. hard-coded!!!
-  var url = 'http://192.168.1.21/led';
+  var url = 'http://192.168.4.1/led'; // Flip-Flip AP mode
 
   if (isPut) {
     url = url + '/' + value;
