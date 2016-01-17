@@ -15,7 +15,7 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
   // Get the first pair
   Tuple *data = dict_find(iterator, KEY_DATA);
   if (data) {
-    snprintf(s_buffer, sizeof(s_buffer), "Received '%d'", data->value->uint8);
+    snprintf(s_buffer, sizeof(s_buffer), "Received '%d'", data->value->uint16); // Flip-Flop uses uint16_t
     text_layer_set_text(text_layer, s_buffer);
   }  
 }
