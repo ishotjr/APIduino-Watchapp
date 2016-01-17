@@ -126,70 +126,83 @@ static void window_load(Window *window) {
   Layer *window_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(window_layer);
 
-  s_debug_layer = text_layer_create((GRect) { .origin = { 0, bounds.size.h - 16 }, .size = { bounds.size.w, 16 } });
+  // centered vertically for visibility on PTR
+  s_debug_layer = text_layer_create((GRect) { .origin = { 0, (bounds.size.h - 16) / 2 }, .size = { bounds.size.w, 16 } });
   text_layer_set_font(s_debug_layer, fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD));
   #ifdef PBL_COLOR
     text_layer_set_text_color(s_debug_layer, GColorBrightGreen);
   #else
-    text_layer_set_text_color(s_debug_layer, GColorWhite);
+    text_layer_set_text_color(s_debug_layer, GColorClear);
   #endif
-  text_layer_set_background_color(s_debug_layer, GColorBlack);
+  text_layer_set_background_color(s_debug_layer, GColorClear);
   text_layer_set_text_alignment(s_debug_layer, GTextAlignmentCenter);
   text_layer_set_overflow_mode(s_debug_layer, GTextOverflowModeTrailingEllipsis);
   text_layer_set_text(s_debug_layer, "Waiting...");
   layer_add_child(window_layer, text_layer_get_layer(s_debug_layer));
 
 
-  s_led_layer = text_layer_create((GRect) { .origin = { 0, 0 }, .size = { bounds.size.w / 2, (bounds.size.h - 16) / 2 } });
+  // each box is now 70x56 + 2px padding in each direction from center
+  // TODO: make all of these layout numbers constants for easy tweaking
+
+  // above/left debug
+  s_led_layer = text_layer_create((GRect) { .origin = { ((bounds.size.w / 2) - 70) - 2, (((bounds.size.h - 16) / 2) - 56) - 2 }, 
+                                            .size = { 70, 56 } });
   text_layer_set_font(s_led_layer, fonts_get_system_font(FONT_KEY_BITHAM_42_BOLD));
   #ifdef PBL_COLOR
-    text_layer_set_text_color(s_led_layer, GColorCyan);
+    text_layer_set_text_color(s_led_layer, GColorElectricBlue);
   #else
-    text_layer_set_text_color(s_led_layer, GColorWhite);
+    text_layer_set_text_color(s_led_layer, GColorClear);
   #endif
-  text_layer_set_background_color(s_led_layer, GColorBlack);
+  text_layer_set_background_color(s_led_layer, GColorClear);
   text_layer_set_text_alignment(s_led_layer, GTextAlignmentCenter);
   text_layer_set_overflow_mode(s_led_layer, GTextOverflowModeTrailingEllipsis);
-  text_layer_set_text(s_led_layer, "???");
+  text_layer_set_text(s_led_layer, "?");
   layer_add_child(window_layer, text_layer_get_layer(s_led_layer));
 
-  s_tmp_layer = text_layer_create((GRect) { .origin = { bounds.size.w / 2, 0 }, .size = { bounds.size.w / 2, (bounds.size.h - 16) / 2 } });
+  // above/right
+  s_tmp_layer = text_layer_create((GRect) { .origin = { (bounds.size.w / 2) + 2, (((bounds.size.h - 16) / 2) - 56) - 2 }, 
+                                            .size = { 70, 56 } });
   text_layer_set_font(s_tmp_layer, fonts_get_system_font(FONT_KEY_BITHAM_42_BOLD));
   #ifdef PBL_COLOR
     text_layer_set_text_color(s_tmp_layer, GColorYellow);
   #else
-    text_layer_set_text_color(s_tmp_layer, GColorWhite);
+    text_layer_set_text_color(s_tmp_layer, GColorClear);
   #endif
-  text_layer_set_background_color(s_tmp_layer, GColorBlack);
+  text_layer_set_background_color(s_tmp_layer, GColorClear);
   text_layer_set_text_alignment(s_tmp_layer, GTextAlignmentCenter);
   text_layer_set_overflow_mode(s_tmp_layer, GTextOverflowModeTrailingEllipsis);
-  text_layer_set_text(s_tmp_layer, "???");
+  text_layer_set_text(s_tmp_layer, "??°");
   layer_add_child(window_layer, text_layer_get_layer(s_tmp_layer));
 
-  s_adc_layer = text_layer_create((GRect) { .origin = { 0, (bounds.size.h - 16) / 2 }, .size = { bounds.size.w / 2, (bounds.size.h - 16) / 2 } });
-  text_layer_set_font(s_adc_layer, fonts_get_system_font(FONT_KEY_BITHAM_42_BOLD));
+  // below/left; note tweaked GRect due to different font/value size
+  s_adc_layer = text_layer_create((GRect) { .origin = { ((bounds.size.w / 2) - 70 - 4) - 2, ((bounds.size.h + 16) / 2) + 2 + 6 }, 
+                                            .size = { 70 + 4, 56 - 12 } });
+  // this value is longer, so use smaller font
+  text_layer_set_font(s_adc_layer, fonts_get_system_font(FONT_KEY_BITHAM_30_BLACK));
   #ifdef PBL_COLOR
     text_layer_set_text_color(s_adc_layer, GColorMagenta);
   #else
-    text_layer_set_text_color(s_adc_layer, GColorWhite);
+    text_layer_set_text_color(s_adc_layer, GColorClear);
   #endif
-  text_layer_set_background_color(s_adc_layer, GColorBlack);
+  text_layer_set_background_color(s_adc_layer, GColorClear);
   text_layer_set_text_alignment(s_adc_layer, GTextAlignmentCenter);
   text_layer_set_overflow_mode(s_adc_layer, GTextOverflowModeTrailingEllipsis);
-  text_layer_set_text(s_adc_layer, "???");
+  text_layer_set_text(s_adc_layer, "????");
   layer_add_child(window_layer, text_layer_get_layer(s_adc_layer));
 
-  s_relay_layer = text_layer_create((GRect) { .origin = { bounds.size.w / 2, (bounds.size.h - 16) / 2 }, .size = { bounds.size.w / 2, (bounds.size.h - 16) / 2 } });
+  // below/right
+  s_relay_layer = text_layer_create((GRect) { .origin = { (bounds.size.w / 2) + 2, ((bounds.size.h + 16) / 2) + 2 }, 
+                                            .size = { 70, 56 } });
   text_layer_set_font(s_relay_layer, fonts_get_system_font(FONT_KEY_BITHAM_42_BOLD));
   #ifdef PBL_COLOR
-    text_layer_set_text_color(s_relay_layer, GColorBlue);
+    text_layer_set_text_color(s_relay_layer, GColorVividCerulean);
   #else
-    text_layer_set_text_color(s_relay_layer, GColorWhite);
+    text_layer_set_text_color(s_relay_layer, GColorClear);
   #endif
-  text_layer_set_background_color(s_relay_layer, GColorBlack);
+  text_layer_set_background_color(s_relay_layer, GColorClear);
   text_layer_set_text_alignment(s_relay_layer, GTextAlignmentCenter);
   text_layer_set_overflow_mode(s_relay_layer, GTextOverflowModeTrailingEllipsis);
-  text_layer_set_text(s_relay_layer, "???");
+  text_layer_set_text(s_relay_layer, "?");
   layer_add_child(window_layer, text_layer_get_layer(s_relay_layer));
 
 }
@@ -210,6 +223,7 @@ static void init(void) {
   // TODO: ^^^ unsure why small (accurate?!) values fail after several messages?
 
   window = window_create();
+  window_set_background_color(window, GColorBlack);
   window_set_click_config_provider(window, click_config_provider);
   window_set_window_handlers(window, (WindowHandlers) {
     .load = window_load,
