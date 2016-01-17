@@ -1,8 +1,8 @@
 {
   "uuid": "13036b53-cd05-4629-ba55-23871da00756",
-  "shortName": "APIduino",
-  "longName": "APIduino Demo Watchapp",
-  "companyName": "ishotjr.com",
+  "shortName": "APIduino F-F",
+  "longName": "APIduino Flip-Flop Demo Watchapp",
+  "companyName": "Flip-Flop IO",
   "versionLabel": "0.1",
   "sdkVersion": "3",
   "targetPlatforms": ["aplite", "basalt", "chalk"],
@@ -11,7 +11,8 @@
   },
   "appKeys": {
     "verb": 0,
-    "data": 1
+    "data": 1,
+    "endpoint": 2
   },
   "resources": {
     "media": []

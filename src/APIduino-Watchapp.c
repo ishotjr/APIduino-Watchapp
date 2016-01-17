@@ -2,6 +2,7 @@
 
 #define KEY_VERB 0 // 0 for GET, 1 for PUT; TODO: enum?
 #define KEY_DATA 1
+#define KEY_ENDPOINT 2 // 0: led; 1: tmp; 2: adc; 3: relay
 
 static Window *window;
 static TextLayer *text_layer;
@@ -44,6 +45,12 @@ static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
   // Add a key-value pair
   dict_write_uint8(iter, KEY_VERB, 0); // GET
   // (KEY_DATA unused for GET)
+  //dict_write_uint8(iter, KEY_ENDPOINT, 0); // led
+  //dict_write_uint8(iter, KEY_ENDPOINT, 1); // tmp - won't work since not int/valid
+  //dict_write_uint8(iter, KEY_ENDPOINT, 2); // adc
+  dict_write_uint8(iter, KEY_ENDPOINT, 3); // relay
+  // KEY_ENDPOINT: 0: led; 1: tmp; 2: adc; 3: relay
+
 
   // Send the message!
   app_message_outbox_send();
@@ -59,6 +66,7 @@ static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
   // Add a key-value pair
   dict_write_uint8(iter, KEY_VERB, 1); // PUT
   dict_write_uint8(iter, KEY_DATA, 1); // ON
+  dict_write_uint8(iter, KEY_ENDPOINT, 0); // led
 
   // Send the message!
   app_message_outbox_send();
@@ -74,6 +82,7 @@ static void down_click_handler(ClickRecognizerRef recognizer, void *context) {
   // Add a key-value pair
   dict_write_uint8(iter, KEY_VERB, 1); // PUT
   dict_write_uint8(iter, KEY_DATA, 0); // OFF
+  dict_write_uint8(iter, KEY_ENDPOINT, 0); // led
 
   // Send the message!
   app_message_outbox_send();
