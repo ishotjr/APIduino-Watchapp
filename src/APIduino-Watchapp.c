@@ -6,6 +6,10 @@
 
 static Window *window;
 static TextLayer *s_debug_layer;
+static TextLayer *s_led_layer;
+static TextLayer *s_tmp_layer;
+static TextLayer *s_adc_layer;
+static TextLayer *s_relay_layer;
 
 static char s_buffer[64];
 
@@ -122,7 +126,7 @@ static void window_load(Window *window) {
   Layer *window_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(window_layer);
 
-  s_debug_layer = text_layer_create((GRect) { .origin = { 0, bounds.size.h - 16 }, .size = { bounds.size.w - 0, 16 } });
+  s_debug_layer = text_layer_create((GRect) { .origin = { 0, bounds.size.h - 16 }, .size = { bounds.size.w, 16 } });
   text_layer_set_font(s_debug_layer, fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD));
   #ifdef PBL_COLOR
     text_layer_set_text_color(s_debug_layer, GColorBrightGreen);
@@ -134,6 +138,60 @@ static void window_load(Window *window) {
   text_layer_set_overflow_mode(s_debug_layer, GTextOverflowModeTrailingEllipsis);
   text_layer_set_text(s_debug_layer, "Waiting...");
   layer_add_child(window_layer, text_layer_get_layer(s_debug_layer));
+
+
+  s_led_layer = text_layer_create((GRect) { .origin = { 0, 0 }, .size = { bounds.size.w / 2, (bounds.size.h - 16) / 2 } });
+  text_layer_set_font(s_led_layer, fonts_get_system_font(FONT_KEY_BITHAM_42_BOLD));
+  #ifdef PBL_COLOR
+    text_layer_set_text_color(s_led_layer, GColorCyan);
+  #else
+    text_layer_set_text_color(s_led_layer, GColorWhite);
+  #endif
+  text_layer_set_background_color(s_led_layer, GColorBlack);
+  text_layer_set_text_alignment(s_led_layer, GTextAlignmentCenter);
+  text_layer_set_overflow_mode(s_led_layer, GTextOverflowModeTrailingEllipsis);
+  text_layer_set_text(s_led_layer, "???");
+  layer_add_child(window_layer, text_layer_get_layer(s_led_layer));
+
+  s_tmp_layer = text_layer_create((GRect) { .origin = { bounds.size.w / 2, 0 }, .size = { bounds.size.w / 2, (bounds.size.h - 16) / 2 } });
+  text_layer_set_font(s_tmp_layer, fonts_get_system_font(FONT_KEY_BITHAM_42_BOLD));
+  #ifdef PBL_COLOR
+    text_layer_set_text_color(s_tmp_layer, GColorYellow);
+  #else
+    text_layer_set_text_color(s_tmp_layer, GColorWhite);
+  #endif
+  text_layer_set_background_color(s_tmp_layer, GColorBlack);
+  text_layer_set_text_alignment(s_tmp_layer, GTextAlignmentCenter);
+  text_layer_set_overflow_mode(s_tmp_layer, GTextOverflowModeTrailingEllipsis);
+  text_layer_set_text(s_tmp_layer, "???");
+  layer_add_child(window_layer, text_layer_get_layer(s_tmp_layer));
+
+  s_adc_layer = text_layer_create((GRect) { .origin = { 0, (bounds.size.h - 16) / 2 }, .size = { bounds.size.w / 2, (bounds.size.h - 16) / 2 } });
+  text_layer_set_font(s_adc_layer, fonts_get_system_font(FONT_KEY_BITHAM_42_BOLD));
+  #ifdef PBL_COLOR
+    text_layer_set_text_color(s_adc_layer, GColorMagenta);
+  #else
+    text_layer_set_text_color(s_adc_layer, GColorWhite);
+  #endif
+  text_layer_set_background_color(s_adc_layer, GColorBlack);
+  text_layer_set_text_alignment(s_adc_layer, GTextAlignmentCenter);
+  text_layer_set_overflow_mode(s_adc_layer, GTextOverflowModeTrailingEllipsis);
+  text_layer_set_text(s_adc_layer, "???");
+  layer_add_child(window_layer, text_layer_get_layer(s_adc_layer));
+
+  s_relay_layer = text_layer_create((GRect) { .origin = { bounds.size.w / 2, (bounds.size.h - 16) / 2 }, .size = { bounds.size.w / 2, (bounds.size.h - 16) / 2 } });
+  text_layer_set_font(s_relay_layer, fonts_get_system_font(FONT_KEY_BITHAM_42_BOLD));
+  #ifdef PBL_COLOR
+    text_layer_set_text_color(s_relay_layer, GColorBlue);
+  #else
+    text_layer_set_text_color(s_relay_layer, GColorWhite);
+  #endif
+  text_layer_set_background_color(s_relay_layer, GColorBlack);
+  text_layer_set_text_alignment(s_relay_layer, GTextAlignmentCenter);
+  text_layer_set_overflow_mode(s_relay_layer, GTextOverflowModeTrailingEllipsis);
+  text_layer_set_text(s_relay_layer, "???");
+  layer_add_child(window_layer, text_layer_get_layer(s_relay_layer));
+
 }
 
 static void window_unload(Window *window) {
