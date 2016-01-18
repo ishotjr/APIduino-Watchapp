@@ -7,3 +7,4 @@ build
 
 # Ignore Screenshots
 pebble-screenshot_*
+pebble_screenshot_*
