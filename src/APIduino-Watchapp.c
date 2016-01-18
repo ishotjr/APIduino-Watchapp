@@ -16,15 +16,67 @@ static char s_buffer[64];
 static void inbox_received_callback(DictionaryIterator *iterator, void *context) {
   APP_LOG(APP_LOG_LEVEL_INFO, "Message received!");
 
-  // Get the first pair
+  // Get the data pair
   Tuple *data = dict_find(iterator, KEY_DATA);
+
+  // Get the endpoint pair
+  Tuple *endpoint = dict_find(iterator, KEY_ENDPOINT);
+
   if (data) {
-    snprintf(s_buffer, sizeof(s_buffer), "Received '%d'", data->value->uint16); // Flip-Flop uses uint16_t
+
     #ifdef PBL_COLOR
       text_layer_set_text_color(s_debug_layer, GColorCyan);
     #endif
+
+    if (endpoint) {
+
+      snprintf(s_buffer, sizeof(s_buffer), "R'd data: %d endpoint: %d", data->value->uint16, endpoint->value->uint16);
+
+      // update UI
+      switch (endpoint->value->uint16) 
+      {
+        static char text_buffer[6];
+
+        // led
+        case 0:
+          // note that this is the requested, rather than "actual" value
+          snprintf(text_buffer, sizeof(text_buffer), "%d", data->value->uint16);
+          text_layer_set_text(s_led_layer, text_buffer);
+          break;
+        // tmp
+        case 1:
+          snprintf(text_buffer, sizeof(text_buffer), "%d°", data->value->uint16);
+          text_layer_set_text(s_tmp_layer, text_buffer);
+          break;
+        // adc
+        case 2:
+          snprintf(text_buffer, sizeof(text_buffer), "%d", data->value->uint16);
+          text_layer_set_text(s_adc_layer, text_buffer);
+          break;
+        // relay
+        case 3:
+          snprintf(text_buffer, sizeof(text_buffer), "%d", data->value->uint16);
+          text_layer_set_text(s_relay_layer, text_buffer);
+          break;
+        default:
+          // ?!
+          #ifdef PBL_COLOR
+            text_layer_set_text_color(s_debug_layer, GColorOrange);
+          #endif
+          break;
+      }
+
+    } else {
+      snprintf(s_buffer, sizeof(s_buffer), "Rec'd data: '%d'", data->value->uint16); // Flip-Flop uses uint16_t
+    }
     text_layer_set_text(s_debug_layer, s_buffer);
-  }  
+  }  else {    
+    #ifdef PBL_COLOR
+      text_layer_set_text_color(s_debug_layer, GColorOrange);
+    #endif
+    text_layer_set_text(s_debug_layer, "Unexpected message received!");
+  }
+
 }
 
 static void inbox_dropped_callback(AppMessageResult reason, void *context) {
@@ -46,7 +98,7 @@ static void outbox_failed_callback(DictionaryIterator *iterator, AppMessageResul
 static void outbox_sent_callback(DictionaryIterator *iterator, void *context) {
   APP_LOG(APP_LOG_LEVEL_INFO, "Outbox send success!");
   #ifdef PBL_COLOR
-    text_layer_set_text_color(s_debug_layer, GColorOrange);
+    text_layer_set_text_color(s_debug_layer, GColorBrightGreen);
   #endif
   text_layer_set_text(s_debug_layer, "Outbox send success!");
 }
@@ -67,6 +119,8 @@ static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
   // Add a key-value pair
   dict_write_uint8(iter, KEY_VERB, 0); // GET
   // (KEY_DATA unused for GET)
+  // *adding anyway due to some weirdness...
+  dict_write_uint8(iter, KEY_DATA, 0); 
   //dict_write_uint8(iter, KEY_ENDPOINT, 0); // led
   //dict_write_uint8(iter, KEY_ENDPOINT, 1); // tmp - won't work since not int/valid
   //dict_write_uint8(iter, KEY_ENDPOINT, 2); // adc

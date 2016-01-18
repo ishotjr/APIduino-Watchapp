@@ -78,9 +78,10 @@ function apiDuinoCall(isPut, value, endpoint) {
       }
 
 
-      // return JSON data value
+      // return JSON data value and original endpoint
       var dict = {
-        'data': data
+        'data': data,
+        'endpoint': endpoint
       };
 
       Pebble.sendAppMessage(dict, function(e) {
