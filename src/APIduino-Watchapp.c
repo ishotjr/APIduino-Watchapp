@@ -11,7 +11,11 @@ static TextLayer *s_tmp_layer;
 static TextLayer *s_adc_layer;
 static TextLayer *s_relay_layer;
 
-static char s_buffer[64];
+static char s_debug_buffer[64];
+static char s_led_buffer[6];
+static char s_tmp_buffer[6];
+static char s_adc_buffer[6];
+static char s_relay_buffer[6];
 
 static void inbox_received_callback(DictionaryIterator *iterator, void *context) {
   APP_LOG(APP_LOG_LEVEL_INFO, "Message received!");
@@ -30,33 +34,31 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
 
     if (endpoint) {
 
-      snprintf(s_buffer, sizeof(s_buffer), "R'd data: %d endpoint: %d", data->value->uint16, endpoint->value->uint16);
+      snprintf(s_debug_buffer, sizeof(s_debug_buffer), "R'd data: %d endpoint: %d", data->value->uint16, endpoint->value->uint16);
 
       // update UI
       switch (endpoint->value->uint16) 
       {
-        static char text_buffer[6];
-
         // led
         case 0:
           // note that this is the requested, rather than "actual" value
-          snprintf(text_buffer, sizeof(text_buffer), "%d", data->value->uint16);
-          text_layer_set_text(s_led_layer, text_buffer);
+          snprintf(s_led_buffer, sizeof(s_led_buffer), "%d", data->value->uint16);
+          text_layer_set_text(s_led_layer, s_led_buffer);
           break;
         // tmp
         case 1:
-          snprintf(text_buffer, sizeof(text_buffer), "%d°", data->value->uint16);
-          text_layer_set_text(s_tmp_layer, text_buffer);
+          snprintf(s_tmp_buffer, sizeof(s_tmp_buffer), "%d°", data->value->uint16);
+          text_layer_set_text(s_tmp_layer, s_tmp_buffer);
           break;
         // adc
         case 2:
-          snprintf(text_buffer, sizeof(text_buffer), "%d", data->value->uint16);
-          text_layer_set_text(s_adc_layer, text_buffer);
+          snprintf(s_adc_buffer, sizeof(s_adc_buffer), "%d", data->value->uint16);
+          text_layer_set_text(s_adc_layer, s_adc_buffer);
           break;
         // relay
         case 3:
-          snprintf(text_buffer, sizeof(text_buffer), "%d", data->value->uint16);
-          text_layer_set_text(s_relay_layer, text_buffer);
+          snprintf(s_relay_buffer, sizeof(s_relay_buffer), "%d", data->value->uint16);
+          text_layer_set_text(s_relay_layer, s_relay_buffer);
           break;
         default:
           // ?!
@@ -67,9 +69,9 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
       }
 
     } else {
-      snprintf(s_buffer, sizeof(s_buffer), "Rec'd data: '%d'", data->value->uint16); // Flip-Flop uses uint16_t
+      snprintf(s_debug_buffer, sizeof(s_debug_buffer), "Rec'd data: '%d'", data->value->uint16); // Flip-Flop uses uint16_t
     }
-    text_layer_set_text(s_debug_layer, s_buffer);
+    text_layer_set_text(s_debug_layer, s_debug_buffer);
   }  else {    
     #ifdef PBL_COLOR
       text_layer_set_text_color(s_debug_layer, GColorOrange);
