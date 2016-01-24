@@ -17,6 +17,34 @@ static char s_tmp_buffer[6];
 static char s_adc_buffer[6];
 static char s_relay_buffer[6];
 
+static AppTimer *temperature_timer;
+
+
+static void temperature_timer_callback(void *data) {
+  #ifdef PBL_COLOR
+    text_layer_set_text_color(s_debug_layer, GColorMagenta);
+  #endif
+  text_layer_set_text(s_debug_layer, "Temp Timer");
+
+  // Begin dictionary
+  DictionaryIterator *iter;
+  app_message_outbox_begin(&iter);
+
+  // Add a key-value pair
+  dict_write_uint8(iter, KEY_VERB, 0); // GET
+  // (KEY_DATA unused for GET)
+  // *adding anyway due to some weirdness...
+  dict_write_uint8(iter, KEY_DATA, 0); 
+  dict_write_uint8(iter, KEY_ENDPOINT, 1); // tmp
+
+  // Send the message!
+  app_message_outbox_send();
+
+
+  // repeat every 15 seconds
+  temperature_timer = app_timer_register(15 * 1000, (AppTimerCallback) temperature_timer_callback, NULL);
+}
+
 static void inbox_received_callback(DictionaryIterator *iterator, void *context) {
   APP_LOG(APP_LOG_LEVEL_INFO, "Message received!");
 
@@ -277,6 +305,9 @@ static void init(void) {
   // Open AppMessage with sensible buffer sizes
   app_message_open(64, 64);
   // TODO: ^^^ unsure why small (accurate?!) values fail after several messages?
+
+  // schedule first temperature update for 5 seconds after launch
+  temperature_timer = app_timer_register(5 * 1000, (AppTimerCallback) temperature_timer_callback, NULL);
 
   window = window_create();
   window_set_background_color(window, GColorBlack);
